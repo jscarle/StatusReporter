@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -39,20 +40,20 @@ internal sealed class StatusReporter : IStatusReporter
         {
             Assembly = AssemblyName,
             Version = AssemblyVersion,
-            BuiltOn = LastModified.ToLocalTime().ToString("O"),
+            BuiltOn = LastModified,
             Framework = RuntimeInformation.FrameworkDescription,
             Environment = _hostEnvironment?.EnvironmentName ?? "Unknown",
             OperatingSystem = RuntimeInformation.OSDescription,
             Hostname = Environment.MachineName,
-            StartedOn = Startup.ToLocalTime().ToString("O"),
-            Current = DateTimeOffset.UtcNow.ToLocalTime().ToString("O"),
-            Uptime = DateTimeOffset.UtcNow.Subtract(Startup.UtcDateTime).ToString("g", CultureInfo.InvariantCulture).Split('.')[0],
+            StartedOn = Startup,
+            Current = DateTimeOffset.UtcNow,
+            Uptime = DateTimeOffset.UtcNow.Subtract(Startup.UtcDateTime),
         };
     }
-    
+
     private static Assembly GetEntryAssembly()
     {
-        return Assembly.GetEntryAssembly() ?? throw new UnreachableException("Could not get entry assembly.");        
+        return Assembly.GetEntryAssembly() ?? throw new UnreachableException("Could not get entry assembly.");
     }
 
     private static string GetAssemblyName()
@@ -67,10 +68,12 @@ internal sealed class StatusReporter : IStatusReporter
         return informationalVersion ?? assemblyVersion;
     }
 
+    [UnconditionalSuppressMessage("SingleFile", "IL3000: Avoid accessing Assembly file path when publishing as a single file", Justification = "Fallbacks have been provided.")]
     private static DateTimeOffset GetLastModified()
     {
         var buildTimestamp = EntryAssembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(attr => attr.Key == "BuildTimestamp")?.Value;
-        if (!string.IsNullOrEmpty(buildTimestamp) && DateTimeOffset.TryParse(buildTimestamp, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal, out var parsedTimestamp))
+        if (!string.IsNullOrEmpty(buildTimestamp)
+            && DateTimeOffset.TryParse(buildTimestamp, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal, out var parsedTimestamp))
             return parsedTimestamp;
 
         if (!string.IsNullOrEmpty(EntryAssembly.Location) && File.Exists(EntryAssembly.Location))

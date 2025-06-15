@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -18,16 +20,20 @@ public static class StatusReporterExtensions
         services.AddSingleton<IStatusReporter, StatusReporter>();
     }
 
-    /// <summary>Maps a status endpoint that returns the current status reported by the <see cref="IStatusReporter" />.</summary>
+    /// <summary>Maps a status endpoint that returns the current status reported by the <see cref="IStatusReporter"/>.</summary>
     /// <param name="app">The endpoint route builder used to map the status endpoint.</param>
     /// <param name="pattern">The route pattern. Defaults to "status".</param>
-    /// <returns>A <see cref="RouteHandlerBuilder" /> that can be used to further configure the endpoint.</returns>
+    /// <returns>A <see cref="RouteHandlerBuilder"/> that can be used to further configure the endpoint.</returns>
+    [RequiresUnreferencedCode("Minimal APIs use reflection that may not be compatible with trimming.")]
+    [RequiresDynamicCode("Minimal APIs use reflection that may not be compatible with AOT.")]
     public static RouteHandlerBuilder MapStatus(this IEndpointRouteBuilder app, string pattern = "status")
     {
         return app.MapGet(pattern, (IStatusReporter statusReporter) =>
-        {
-            var status = statusReporter.GetStatus();
-            return TypedResults.Ok(status);
-        });
+            {
+                var status = statusReporter.GetStatus().ToJson();
+                var json = JsonSerializer.Serialize(status, StatusReporterJsonContext.Default.ApplicationStatusJson);
+                return Results.Content(json, "application/json");
+            }
+        );
     }
 }
