@@ -69,6 +69,13 @@ internal sealed class StatusReporter : IStatusReporter
 
     private static DateTimeOffset GetLastModified()
     {
-        return new DateTimeOffset(File.GetLastWriteTimeUtc(EntryAssembly.Location), TimeSpan.Zero);
+        var buildTimestamp = EntryAssembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(attr => attr.Key == "BuildTimestamp")?.Value;
+        if (!string.IsNullOrEmpty(buildTimestamp) && DateTimeOffset.TryParse(buildTimestamp, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal, out var parsedTimestamp))
+            return parsedTimestamp;
+
+        if (!string.IsNullOrEmpty(EntryAssembly.Location) && File.Exists(EntryAssembly.Location))
+            return new DateTimeOffset(File.GetLastWriteTimeUtc(EntryAssembly.Location), TimeSpan.Zero);
+
+        return DateTimeOffset.MinValue;
     }
 }
