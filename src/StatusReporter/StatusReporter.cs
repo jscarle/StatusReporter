@@ -68,7 +68,6 @@ internal sealed class StatusReporter : IStatusReporter
         return informationalVersion ?? assemblyVersion;
     }
 
-    [UnconditionalSuppressMessage("SingleFile", "IL3000: Avoid accessing Assembly file path when publishing as a single file", Justification = "Fallbacks have been provided.")]
     private static DateTimeOffset GetLastModified()
     {
         var buildTimestamp = EntryAssembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(attr => attr.Key == "BuildTimestamp")?.Value;

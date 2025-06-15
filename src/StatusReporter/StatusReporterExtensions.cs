@@ -24,8 +24,6 @@ public static class StatusReporterExtensions
     /// <param name="app">The endpoint route builder used to map the status endpoint.</param>
     /// <param name="pattern">The route pattern. Defaults to "status".</param>
     /// <returns>A <see cref="RouteHandlerBuilder"/> that can be used to further configure the endpoint.</returns>
-    [RequiresUnreferencedCode("Minimal APIs use reflection that may not be compatible with trimming.")]
-    [RequiresDynamicCode("Minimal APIs use reflection that may not be compatible with AOT.")]
     public static RouteHandlerBuilder MapStatus(this IEndpointRouteBuilder app, string pattern = "status")
     {
         return app.MapGet(pattern, (IStatusReporter statusReporter) =>
