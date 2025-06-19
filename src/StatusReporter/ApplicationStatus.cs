@@ -1,8 +1,4 @@
-﻿using System.Globalization;
-using System.Text.Encodings.Web;
-using System.Text.Json.Serialization;
-
-namespace StatusReporter;
+﻿namespace StatusReporter;
 
 /// <summary>Represents the status information of the application.</summary>
 public sealed class ApplicationStatus
@@ -36,39 +32,4 @@ public sealed class ApplicationStatus
 
     /// <summary>Gets the uptime of the server.</summary>
     public required TimeSpan Uptime { get; init; }
-
-    internal ApplicationStatusJson ToJson()
-    {
-        return new ApplicationStatusJson
-        {
-            Assembly = Assembly,
-            Version = Version,
-            BuiltOn = BuiltOn.ToLocalTime().ToString("O"),
-            Framework = Framework,
-            Hostname = Hostname,
-            OperatingSystem = OperatingSystem,
-            Environment = Environment,
-            StartedOn = StartedOn.ToLocalTime().ToString("O"),
-            Current = Current.ToLocalTime().ToString("O"),
-            Uptime = Uptime.ToString("g", CultureInfo.InvariantCulture).Split('.')[0],
-        };
-    }
 }
-
-internal sealed class ApplicationStatusJson
-{
-    public string Assembly { get; set; } = "";
-    public string Version { get; set; } = "";
-    public string BuiltOn { get; set; } = "";
-    public string Framework { get; set; } = "";
-    public string Hostname { get; set; } = "";
-    public string OperatingSystem { get; set; } = "";
-    public string Environment { get; set; } = "";
-    public string StartedOn { get; set; } = "";
-    public string Current { get; set; } = "";
-    public string Uptime { get; set; } = "";
-}
-
-[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, WriteIndented = true)]
-[JsonSerializable(typeof(ApplicationStatusJson))]
-internal sealed partial class StatusReporterJsonContext : JsonSerializerContext;
