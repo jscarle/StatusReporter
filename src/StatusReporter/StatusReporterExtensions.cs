@@ -1,7 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,14 +28,21 @@ public static class StatusReporterExtensions
     /// <param name="app">The endpoint route builder used to map the status endpoint.</param>
     /// <param name="pattern">The route pattern. Defaults to "status".</param>
     /// <returns>A <see cref="RouteHandlerBuilder"/> that can be used to further configure the endpoint.</returns>
+    [RequiresUnreferencedCode("This API may perform reflection on the supplied delegate and its parameters. These types may be trimmed if not directly referenced.")]
+    [RequiresDynamicCode("This API may perform reflection on the supplied delegate and its parameters. These types may require generated code and aren't compatible with native AOT applications.")]
     public static RouteHandlerBuilder MapStatus(this IEndpointRouteBuilder app, string pattern = "status")
     {
-        return app.MapGet(pattern, (IStatusReporter statusReporter) =>
-            {
-                var status = statusReporter.GetStatus().ToJson();
-                var json = JsonSerializer.Serialize(status, StatusReporterJsonContext.Default.ApplicationStatusJson);
-                return Results.Content(json, "application/json");
-            }
-        );
+        return app.MapGet(pattern, GetStatus)
+            .Produces<ApplicationStatus>((int)HttpStatusCode.OK, "application/json")
+            .WithName(nameof(GetStatus))
+            .WithSummary("Gets the current status of the application.")
+            .WithTags("Status");
+    }
+
+    private static IResult GetStatus([FromServices] IStatusReporter statusReporter)
+    {
+        var status = statusReporter.GetStatus().ToJson();
+        var json = JsonSerializer.Serialize(status, StatusReporterJsonContext.Default.ApplicationStatusJson);
+        return Results.Content(json, "application/json", Encoding.UTF8, (int)HttpStatusCode.OK);
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace StatusReporter;
 
-/// <summary>Provides the status of the server by implementing the <see cref="IStatusReporter"/> interface.</summary>
+/// <summary>Provides the status of the application by implementing the <see cref="IStatusReporter"/> interface.</summary>
 internal sealed class StatusReporter : IStatusReporter
 {
     private static readonly Assembly EntryAssembly = GetEntryAssembly();
@@ -68,6 +68,7 @@ internal sealed class StatusReporter : IStatusReporter
         return informationalVersion ?? assemblyVersion;
     }
 
+    [UnconditionalSuppressMessage("SingleFile", "IL3000:Avoid accessing Assembly file path when publishing as a single file", Justification = "Fallbacks have been added to handle cases where the assembly is a single file.")]
     private static DateTimeOffset GetLastModified()
     {
         var buildTimestamp = EntryAssembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(attr => attr.Key == "BuildTimestamp")?.Value;
