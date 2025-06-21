@@ -24,14 +24,16 @@ internal static class GetStatusResponseExtensions
         {
             Assembly = applicationStatus.Assembly,
             Version = applicationStatus.Version,
-            BuiltOn = applicationStatus.BuiltOn.ToLocalTime().ToString("O"),
+            BuiltOn = applicationStatus.BuiltOn.ToLocalTime().ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
             Framework = applicationStatus.Framework,
             Hostname = applicationStatus.Hostname,
             OperatingSystem = applicationStatus.OperatingSystem,
             Environment = applicationStatus.Environment,
-            StartedOn = applicationStatus.StartedOn.ToLocalTime().ToString("O"),
-            Current = applicationStatus.Current.ToLocalTime().ToString("O"),
-            Uptime = applicationStatus.Uptime.ToString("g", CultureInfo.InvariantCulture).Split('.')[0],
+            StartedOn = applicationStatus.StartedOn.ToLocalTime().ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
+            Current = applicationStatus.Current.ToLocalTime().ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
+            Uptime = applicationStatus.Uptime.Days > 0
+                ? applicationStatus.Uptime.ToString(@"d\.hh\:mm\:ss", CultureInfo.InvariantCulture)
+                : applicationStatus.Uptime.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture),
         };
     }
 }

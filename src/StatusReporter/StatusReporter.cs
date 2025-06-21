@@ -24,12 +24,15 @@ internal sealed class StatusReporter : IStatusReporter
     /// <summary>The startup time of the application.</summary>
     private static readonly DateTimeOffset Startup = DateTimeOffset.UtcNow;
 
+    private readonly StatusReporterOptions _options;
     private readonly IHostEnvironment? _hostEnvironment;
 
     /// <summary>Initializes a new instance of the <see cref="StatusReporter"/> class.</summary>
+    /// <param name="options">The <see cref="StatusReporterOptions"/> instance that provides configuration options for the status reporter.</param>
     /// <param name="hostEnvironment">The <see cref="IHostEnvironment"/> instance that provides information about the hosting environment.</param>
-    public StatusReporter(IHostEnvironment? hostEnvironment = null)
+    public StatusReporter(StatusReporterOptions options, IHostEnvironment? hostEnvironment = null)
     {
+        _options = options;
         _hostEnvironment = hostEnvironment;
     }
 
@@ -40,14 +43,14 @@ internal sealed class StatusReporter : IStatusReporter
         {
             Assembly = AssemblyName,
             Version = AssemblyVersion,
-            BuiltOn = LastModified,
+            BuiltOn = TimeZoneInfo.ConvertTime(LastModified, _options.TimeZone),
             Framework = RuntimeInformation.FrameworkDescription,
             Environment = _hostEnvironment?.EnvironmentName ?? "Unknown",
             OperatingSystem = RuntimeInformation.OSDescription,
             Hostname = Environment.MachineName,
-            StartedOn = Startup,
-            Current = DateTimeOffset.UtcNow,
-            Uptime = DateTimeOffset.UtcNow.Subtract(Startup.UtcDateTime),
+            StartedOn = TimeZoneInfo.ConvertTime(Startup, _options.TimeZone),
+            Current = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, _options.TimeZone),
+            Uptime = DateTimeOffset.UtcNow.Subtract(Startup),
         };
     }
 
@@ -68,7 +71,9 @@ internal sealed class StatusReporter : IStatusReporter
         return informationalVersion ?? assemblyVersion;
     }
 
-    [UnconditionalSuppressMessage("SingleFile", "IL3000:Avoid accessing Assembly file path when publishing as a single file", Justification = "Fallbacks have been added to handle cases where the assembly is a single file.")]
+    [UnconditionalSuppressMessage("SingleFile", "IL3000:Avoid accessing Assembly file path when publishing as a single file",
+        Justification = "Fallbacks have been added to handle cases where the assembly is a single file."
+    )]
     private static DateTimeOffset GetLastModified()
     {
         var buildTimestamp = EntryAssembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(attr => attr.Key == "BuildTimestamp")?.Value;

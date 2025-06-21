@@ -15,10 +15,15 @@ public static class StatusReporterExtensions
 {
     /// <summary>Adds the status reporter to the service collection, ensuring it is pre-initialized for accurate uptime reporting.</summary>
     /// <param name="services">The service collection to which the status reporter is added.</param>
-    public static void AddStatusReporter(this IServiceCollection services)
+    /// <param name="configureOptions">An optional action to configure the <see cref="StatusReporterOptions"/>.</param>
+    public static void AddStatusReporter(this IServiceCollection services, Action<StatusReporterOptions>? configureOptions = null)
     {
-        // Pre-initialize the status reporter to accurately report uptime.
-        var statusReporter = new StatusReporter();
+        var options = new StatusReporterOptions();
+        configureOptions?.Invoke(options);
+
+        services.AddSingleton(options);
+
+        var statusReporter = new StatusReporter(options);
         _ = statusReporter.GetStatus();
         services.AddSingleton<IStatusReporter, StatusReporter>();
     }
