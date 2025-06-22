@@ -24,13 +24,13 @@ internal static class GetStatusResponseExtensions
         {
             Assembly = applicationStatus.Assembly,
             Version = applicationStatus.Version,
-            BuiltOn = applicationStatus.BuiltOn.ToLocalTime().ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
+            BuiltOn = applicationStatus.BuiltOn.ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
             Framework = applicationStatus.Framework,
             Hostname = applicationStatus.Hostname,
             OperatingSystem = applicationStatus.OperatingSystem,
             Environment = applicationStatus.Environment,
-            StartedOn = applicationStatus.StartedOn.ToLocalTime().ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
-            Current = applicationStatus.Current.ToLocalTime().ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
+            StartedOn = applicationStatus.StartedOn.ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
+            Current = applicationStatus.Current.ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
             Uptime = applicationStatus.Uptime.Days > 0
                 ? applicationStatus.Uptime.ToString(@"d\.hh\:mm\:ss", CultureInfo.InvariantCulture)
                 : applicationStatus.Uptime.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture),
