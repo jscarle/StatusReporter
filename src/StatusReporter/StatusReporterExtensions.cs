@@ -21,6 +21,8 @@ public static class StatusReporterExtensions
         var options = new StatusReporterOptions();
         configureOptions?.Invoke(options);
 
+        ArgumentNullException.ThrowIfNull(options.TimeZone);
+
         services.AddSingleton(options);
 
         var statusReporter = new StatusReporter(options);
