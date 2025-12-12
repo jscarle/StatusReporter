@@ -32,6 +32,9 @@ internal sealed class StatusReporter : IStatusReporter
     /// <param name="hostEnvironment">The <see cref="IHostEnvironment"/> instance that provides information about the hosting environment.</param>
     public StatusReporter(StatusReporterOptions options, IHostEnvironment? hostEnvironment = null)
     {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(options.TimeZone);
+
         _options = options;
         _hostEnvironment = hostEnvironment;
     }
