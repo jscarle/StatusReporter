@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
@@ -20,13 +21,10 @@ public static class StatusReporterExtensions
     {
         var options = new StatusReporterOptions();
         configureOptions?.Invoke(options);
-
         ArgumentNullException.ThrowIfNull(options.TimeZone);
-
         services.AddSingleton(options);
 
-        var statusReporter = new StatusReporter(options);
-        _ = statusReporter.GetStatus();
+        RuntimeHelpers.RunClassConstructor(typeof(StatusReporter).TypeHandle);
         services.AddSingleton<IStatusReporter, StatusReporter>();
     }
 
@@ -51,7 +49,8 @@ public static class StatusReporterExtensions
 
     private static IResult GetStatus([FromServices] IStatusReporter statusReporter)
     {
-        var status = statusReporter.GetStatus().ToResponse();
+        var status = statusReporter.GetStatus()
+            .ToResponse();
         var json = JsonSerializer.Serialize(status, StatusReporterJsonContext.Default.GetStatusResponse);
         return Results.Content(json, "application/json", Encoding.UTF8, (int)HttpStatusCode.OK);
     }
