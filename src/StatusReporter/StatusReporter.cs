@@ -32,6 +32,9 @@ internal sealed class StatusReporter : IStatusReporter
     /// <param name="hostEnvironment">The <see cref="IHostEnvironment"/> instance that provides information about the hosting environment.</param>
     public StatusReporter(StatusReporterOptions options, IHostEnvironment? hostEnvironment = null)
     {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(options.TimeZone);
+
         _options = options;
         _hostEnvironment = hostEnvironment;
     }
@@ -39,6 +42,8 @@ internal sealed class StatusReporter : IStatusReporter
     /// <inheritdoc/>
     public ApplicationStatus GetStatus()
     {
+        var currentTime = DateTimeOffset.UtcNow;
+
         return new ApplicationStatus
         {
             Assembly = AssemblyName,
@@ -49,8 +54,8 @@ internal sealed class StatusReporter : IStatusReporter
             OperatingSystem = RuntimeInformation.OSDescription,
             Hostname = Environment.MachineName,
             StartedOn = TimeZoneInfo.ConvertTime(Startup, _options.TimeZone),
-            Current = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, _options.TimeZone),
-            Uptime = DateTimeOffset.UtcNow.Subtract(Startup),
+            Current = TimeZoneInfo.ConvertTime(currentTime, _options.TimeZone),
+            Uptime = currentTime.Subtract(Startup),
         };
     }
 

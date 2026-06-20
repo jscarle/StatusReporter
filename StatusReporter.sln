@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusReporter", "src\StatusReporter\StatusReporter.csproj", "{581EFF96-AE15-483F-906E-A32773388DFC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{37269956-5A0C-4600-9FED-48AE6EAF3F50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusReporter.Playground", "tools\StatusReporter.Playground\StatusReporter.Playground.csproj", "{9DC2C797-3CD9-41C0-A7DA-B78FAB564572}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,12 @@ Global
 		{581EFF96-AE15-483F-906E-A32773388DFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{581EFF96-AE15-483F-906E-A32773388DFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{581EFF96-AE15-483F-906E-A32773388DFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DC2C797-3CD9-41C0-A7DA-B78FAB564572}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DC2C797-3CD9-41C0-A7DA-B78FAB564572}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DC2C797-3CD9-41C0-A7DA-B78FAB564572}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DC2C797-3CD9-41C0-A7DA-B78FAB564572}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9DC2C797-3CD9-41C0-A7DA-B78FAB564572} = {37269956-5A0C-4600-9FED-48AE6EAF3F50}
 	EndGlobalSection
 EndGlobal

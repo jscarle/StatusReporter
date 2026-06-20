@@ -22,19 +22,19 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="10.15.0.120848">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="10.27.0.140913">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.300" PrivateAssets="All" />
     </ItemGroup>
 
     <!-- Output -->
     <PropertyGroup>
         <AssemblyName>StatusReporter</AssemblyName>
-        <Version>10.0.0</Version>
-        <AssemblyVersion>10.0.0.0</AssemblyVersion>
-        <FileVersion>10.0.0.0</FileVersion>
+        <Version>10.0.1</Version>
+        <AssemblyVersion>10.0.1.0</AssemblyVersion>
+        <FileVersion>10.0.1.0</FileVersion>
         <NeutralLanguage>en-US</NeutralLanguage>
         <Optimize>true</Optimize>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
@@ -52,7 +52,7 @@
         <RepositoryUrl>https://github.com/jscarle/StatusReporter</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <Authors>Jean-Sebastien Carle</Authors>
-        <Copyright>Copyright © Jean-Sebastien Carle 2025</Copyright>
+        <Copyright>Copyright © Jean-Sebastien Carle 2025-2026</Copyright>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
         <PackageIcon>Icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
@@ -64,5 +64,10 @@
         <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" Visible="false"/>
         <None Include="..\..\Icon.png" Pack="true" PackagePath="\" Visible="false"/>
     </ItemGroup>
-
+    
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+    
 </Project>
