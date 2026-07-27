@@ -61,7 +61,7 @@ public static partial class StatusReporterExtensions
     {
         return new GetStatusResponse
         {
-            Assembly = applicationStatus.Assembly,
+            Assembly = includeSystemInformation ? applicationStatus.Assembly : null,
             VersionId = applicationStatus.VersionId.ToString("D"),
             Version = applicationStatus.Version,
             BuiltOn = applicationStatus.BuiltOn.ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),

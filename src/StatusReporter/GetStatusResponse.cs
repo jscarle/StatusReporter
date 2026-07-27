@@ -2,7 +2,7 @@
 
 internal sealed class GetStatusResponse
 {
-    public required string Assembly { get; init; }
+    public required string? Assembly { get; init; }
     public required string VersionId { get; init; }
     public required string Version { get; init; }
     public required string BuiltOn { get; init; }
