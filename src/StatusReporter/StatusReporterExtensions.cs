@@ -1,8 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace StatusReporter;
 
 /// <summary>Provides extension methods for adding and configuring a status reporter in the service collection and endpoints.</summary>
-public static class StatusReporterExtensions
+public static partial class StatusReporterExtensions
 {
     /// <summary>Adds the status reporter to the service collection, ensuring it is pre-initialized for accurate uptime reporting.</summary>
     /// <param name="services">The service collection to which the status reporter is added.</param>
@@ -47,11 +49,37 @@ public static class StatusReporterExtensions
             .WithTags("Status");
     }
 
-    private static IResult GetStatus([FromServices] IStatusReporter statusReporter)
+    private static IResult GetStatus([FromServices] IStatusReporter statusReporter, [FromServices] StatusReporterOptions options)
     {
         var status = statusReporter.GetStatus()
-            .ToResponse();
+            .ToResponse(options.IncludeSystemInformation);
         var json = JsonSerializer.Serialize(status, StatusReporterJsonContext.Default.GetStatusResponse);
         return Results.Content(json, "application/json", Encoding.UTF8, (int)HttpStatusCode.OK);
     }
+    
+    private static GetStatusResponse ToResponse(this ApplicationStatus applicationStatus, bool includeSystemInformation)
+    {
+        return new GetStatusResponse
+        {
+            Assembly = applicationStatus.Assembly,
+            VersionId = applicationStatus.VersionId.ToString("D"),
+            Version = applicationStatus.Version,
+            BuiltOn = applicationStatus.BuiltOn.ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
+            StartedOn = applicationStatus.StartedOn.ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
+            Current = applicationStatus.Current.ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture),
+            Uptime = applicationStatus.Uptime.Days > 0
+                ? applicationStatus.Uptime.ToString(@"d\.hh\:mm\:ss", CultureInfo.InvariantCulture)
+                : applicationStatus.Uptime.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture),
+            TargetFramework = includeSystemInformation ? applicationStatus.TargetFramework : null,
+            Framework = includeSystemInformation ? applicationStatus.Framework : null,
+            Hostname = includeSystemInformation ? applicationStatus.Hostname : null,
+            RuntimeIdentifier = includeSystemInformation ? applicationStatus.RuntimeIdentifier : null,
+            OperatingSystem = includeSystemInformation ? applicationStatus.OperatingSystem : null,
+            Environment = includeSystemInformation ? applicationStatus.Environment : null,
+        };
+    }
+    
+    [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonSerializable(typeof(GetStatusResponse))]
+    private sealed partial class StatusReporterJsonContext : JsonSerializerContext;
 }

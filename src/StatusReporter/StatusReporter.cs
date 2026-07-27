@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.Hosting;
 
 namespace StatusReporter;
@@ -17,6 +18,9 @@ internal sealed class StatusReporter : IStatusReporter
 
     /// <summary>The version of the entry assembly.</summary>
     private static readonly string AssemblyVersion = GetAssemblyVersion();
+
+    /// <summary>The version of the entry target framework.</summary>
+    private static readonly string AssemblyTargetFramework = GetAssemblyTargetFramework();
 
     /// <summary>The last modified date of the entry assembly.</summary>
     private static readonly DateTimeOffset LastModified = GetLastModified();
@@ -47,15 +51,18 @@ internal sealed class StatusReporter : IStatusReporter
         return new ApplicationStatus
         {
             Assembly = AssemblyName,
+            VersionId = EntryAssembly.ManifestModule.ModuleVersionId,
             Version = AssemblyVersion,
             BuiltOn = TimeZoneInfo.ConvertTime(LastModified, _options.TimeZone),
-            Framework = RuntimeInformation.FrameworkDescription,
-            Environment = _hostEnvironment?.EnvironmentName ?? "Unknown",
-            OperatingSystem = RuntimeInformation.OSDescription,
-            Hostname = Environment.MachineName,
             StartedOn = TimeZoneInfo.ConvertTime(Startup, _options.TimeZone),
             Current = TimeZoneInfo.ConvertTime(currentTime, _options.TimeZone),
             Uptime = currentTime.Subtract(Startup),
+            TargetFramework = AssemblyTargetFramework,
+            Framework = RuntimeInformation.FrameworkDescription,
+            Hostname = Environment.MachineName,
+            RuntimeIdentifier = RuntimeInformation.RuntimeIdentifier,
+            OperatingSystem = RuntimeInformation.OSDescription,
+            Environment = _hostEnvironment?.EnvironmentName ?? "Unknown",
         };
     }
 
@@ -74,6 +81,11 @@ internal sealed class StatusReporter : IStatusReporter
         var informationalVersion = EntryAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0];
         var assemblyVersion = EntryAssembly.GetName().Version?.ToString(3) ?? throw new UnreachableException("Could not get assembly version.");
         return informationalVersion ?? assemblyVersion;
+    }
+
+    private static string GetAssemblyTargetFramework()
+    {
+        return EntryAssembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName ?? throw new UnreachableException("Could not get assembly target framework.");
     }
 
     [UnconditionalSuppressMessage("SingleFile", "IL3000:Avoid accessing Assembly file path when publishing as a single file",
