@@ -3,10 +3,9 @@
     <!-- Compilation -->
     <PropertyGroup>
         <RootNamespace>StatusReporter</RootNamespace>
-        <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>latest</LangVersion>
         <PublishAot>true</PublishAot>
     </PropertyGroup>
 
@@ -22,19 +21,18 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="10.30.0.144632">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="10.35.0.4138">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.301" PrivateAssets="All" />
     </ItemGroup>
 
     <!-- Output -->
     <PropertyGroup>
         <AssemblyName>StatusReporter</AssemblyName>
-        <Version>10.0.3</Version>
-        <AssemblyVersion>10.0.3.0</AssemblyVersion>
-        <FileVersion>10.0.3.0</FileVersion>
+        <Version>11.0.0</Version>
+        <AssemblyVersion>11.0.0.0</AssemblyVersion>
+        <FileVersion>11.0.0.0</FileVersion>
         <NeutralLanguage>en-US</NeutralLanguage>
         <Optimize>true</Optimize>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
