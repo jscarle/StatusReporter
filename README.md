@@ -2,6 +2,8 @@
 
 A status reporter for .NET Web Applications and APIs.
 
+Supports .NET 8, .NET 9, .NET 10, and .NET 11.
+
 ## Quick Start
 
 ### Register the Status Reporter
