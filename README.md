@@ -34,3 +34,11 @@ app.MapStatus();
   "uptime": "3:20:08"
 }
 ```
+
+## Trimming and Native AOT
+
+StatusReporter supports trimming and Native AOT on .NET 8, 9, 10, and 11. The library declares `IsAotCompatible`, maps its endpoint with an explicit request delegate, and uses source-generated JSON serialization.
+
+Enable Native AOT publishing in your application with `<PublishAot>true</PublishAot>`. `MapStatus` retains its `RouteHandlerBuilder` return type, so endpoint conventions such as authorization can still be chained.
+
+For a meaningful `BuiltOn` value in native or single-file deployments, provide a parseable `AssemblyMetadataAttribute` named `BuildTimestamp` on your entry assembly. Without it, `BuiltOn` falls back to `DateTimeOffset.MinValue` when the assembly file is unavailable.
