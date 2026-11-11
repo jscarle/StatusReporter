@@ -39,3 +39,27 @@ jobs:
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v4
+
+  native-aot:
+    name: Native AOT
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup .NET 11.0
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore Native AOT smoke test
+        run: dotnet restore ./tests/StatusReporter.AotSmoke/StatusReporter.AotSmoke.csproj --runtime linux-x64
+
+      - name: Publish Native AOT smoke test
+        run: dotnet publish ./tests/StatusReporter.AotSmoke/StatusReporter.AotSmoke.csproj --configuration Release --framework net11.0 --runtime linux-x64 --no-restore --output ./artifacts/native-aot
+
+      - name: Run Native AOT smoke test
+        run: ./artifacts/native-aot/StatusReporter.AotSmoke

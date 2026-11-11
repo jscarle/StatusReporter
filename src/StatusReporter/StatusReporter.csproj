@@ -6,7 +6,7 @@
         <TargetFrameworks>net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <PublishAot>true</PublishAot>
+        <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
     <!-- Analysis -->
@@ -30,9 +30,9 @@
     <!-- Output -->
     <PropertyGroup>
         <AssemblyName>StatusReporter</AssemblyName>
-        <Version>11.0.0</Version>
-        <AssemblyVersion>11.0.0.0</AssemblyVersion>
-        <FileVersion>11.0.0.0</FileVersion>
+        <Version>11.0.1</Version>
+        <AssemblyVersion>11.0.1.0</AssemblyVersion>
+        <FileVersion>11.0.1.0</FileVersion>
         <NeutralLanguage>en-US</NeutralLanguage>
         <Optimize>true</Optimize>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>

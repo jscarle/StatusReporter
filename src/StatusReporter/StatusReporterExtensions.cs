@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Runtime.CompilerServices;
@@ -7,7 +6,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,27 +32,29 @@ public static partial class StatusReporterExtensions
     /// <param name="app">The endpoint route builder used to map the status endpoint.</param>
     /// <param name="pattern">The route pattern. Defaults to "status".</param>
     /// <returns>A <see cref="RouteHandlerBuilder"/> that can be used to further configure the endpoint.</returns>
-    [RequiresUnreferencedCode(
-        "This API may perform reflection on the supplied delegate and its parameters. These types may be trimmed if not directly referenced."
-    )]
-    [RequiresDynamicCode(
-        "This API may perform reflection on the supplied delegate and its parameters. These types may require generated code and aren't compatible with native AOT applications."
-    )]
     public static RouteHandlerBuilder MapStatus(this IEndpointRouteBuilder app, string pattern = "status")
     {
-        return app.MapGet(pattern, GetStatus)
+        RequestDelegate requestDelegate = GetStatusAsync;
+        var endpointBuilder = app.MapGet(pattern, requestDelegate);
+        var routeHandlerBuilder = new RouteHandlerBuilder([endpointBuilder])
             .Produces<ApplicationStatus>((int)HttpStatusCode.OK, "application/json")
-            .WithName(nameof(GetStatus))
+            .WithName(nameof(IStatusReporter.GetStatus))
             .WithSummary("Gets the current status of the application.")
             .WithTags("Status");
+
+        return routeHandlerBuilder;
     }
 
-    private static IResult GetStatus([FromServices] IStatusReporter statusReporter, [FromServices] StatusReporterOptions options)
+    private static Task GetStatusAsync(HttpContext context)
     {
-        var status = statusReporter.GetStatus()
-            .ToResponse(options.IncludeSystemInformation);
-        var json = JsonSerializer.Serialize(status, StatusReporterJsonContext.Default.GetStatusResponse);
-        return Results.Content(json, "application/json", Encoding.UTF8, (int)HttpStatusCode.OK);
+        var statusReporter = context.RequestServices.GetRequiredService<IStatusReporter>();
+        var options = context.RequestServices.GetRequiredService<StatusReporterOptions>();
+        var applicationStatus = statusReporter.GetStatus();
+        var response = applicationStatus.ToResponse(options.IncludeSystemInformation);
+        var json = JsonSerializer.Serialize(response, StatusReporterJsonContext.Default.GetStatusResponse);
+        var result = Results.Content(json, "application/json", Encoding.UTF8, (int)HttpStatusCode.OK);
+
+        return result.ExecuteAsync(context);
     }
     
     private static GetStatusResponse ToResponse(this ApplicationStatus applicationStatus, bool includeSystemInformation)
